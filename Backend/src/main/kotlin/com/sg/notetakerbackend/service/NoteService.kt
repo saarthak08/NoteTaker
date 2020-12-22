@@ -5,14 +5,18 @@ import com.sg.notetakerbackend.model.User
 import com.sg.notetakerbackend.repository.NoteRepository
 import com.sg.notetakerbackend.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import kotlin.jvm.Throws
 
 @Service
-class NoteService @Autowired constructor(private val noteRepository: NoteRepository,private val userRepository: UserRepository) {
+class NoteService @Autowired constructor(
+    private val noteRepository: NoteRepository,
+    private val userRepository: UserRepository
+) {
 
     @Throws(Exception::class)
-    fun addNote(note:Note,user:User) {
+    fun addNote(note: Note, user: User) {
         note.user = user;
         user.notes.add(note);
         noteRepository.save(note);
@@ -20,26 +24,31 @@ class NoteService @Autowired constructor(private val noteRepository: NoteReposit
     }
 
     @Throws(Exception::class)
-    fun deleteNote(noteId:Long,user:User) {
+    fun deleteNote(note: Note, user: User) {
+        val dbNote: Note = noteRepository.findByIdOrNull(note.id) ?: throw Exception("No note found with id=${note.id} for current user!");
         user.notes.removeIf {
-            it.id==noteId;
+            it.id == note.id;
         }
         userRepository.save(user);
-        noteRepository.deleteById(noteId);
+        noteRepository.delete(dbNote);
     }
 
-    fun updateNote(note:Note,user:User) {
-        val index=user.notes.find {
-            it.id==note.id
-        }?.id;
-        if (index != null) {
-            user.notes[index.toInt()] = note
+    @Throws(Exception::class)
+    fun updateNote(note: Note, user: User) {
+        val dbNote: Note = noteRepository.findByIdOrNull(note.id) ?: throw Exception("No note found with id=${note.id} for current user!");
+        dbNote.title=note.title;
+        dbNote.description=note.description;
+        user.notes.forEach {
+            if (it.id == note.id) {
+                it.title = note.title;
+                it.description = note.description;
+            }
         };
-        noteRepository.save(note);
+        noteRepository.save(dbNote);
         userRepository.save(user);
     }
 
-    fun getAllNotes(user:User):MutableList<Note> {
+    fun getAllNotes(user: User): MutableList<Note> {
         return user.notes;
     }
 }

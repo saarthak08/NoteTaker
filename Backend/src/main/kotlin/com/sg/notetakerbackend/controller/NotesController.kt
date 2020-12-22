@@ -24,15 +24,23 @@ class NotesController @Autowired constructor(
     }
 
     @DeleteMapping
-    fun deleteNote(@RequestBody id: Long): Any {
-        noteService.deleteNote(id, userService.getCurrentUser()!!);
-        return ResponseEntity("",HttpStatus.OK);
+    fun deleteNote(@RequestBody note: Note): Any {
+        return try {
+            noteService.deleteNote(note, userService.getCurrentUser()!!);
+            ResponseEntity("", HttpStatus.OK);
+        } catch (e:Exception) {
+            ResponseEntity(e.message,HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping
     fun updateNote(@RequestBody note: Note): Any {
-        noteService.updateNote(note, userService.getCurrentUser()!!);
-        return ResponseEntity("",HttpStatus.OK);
+        return try {
+            noteService.updateNote(note, userService.getCurrentUser()!!);
+            ResponseEntity("", HttpStatus.OK);
+        } catch (e:Exception) {
+            ResponseEntity(e.message,HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping

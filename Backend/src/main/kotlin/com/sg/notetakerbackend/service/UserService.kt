@@ -18,22 +18,14 @@ class UserService @Autowired constructor(private val userRepository: UserReposit
 
     @kotlin.jvm.Throws(AuthenticationException::class)
     fun getCurrentUser(): User? {
-        return if (UserService.user == null) {
-            if (SecurityContextHolder.getContext().authentication.isAuthenticated) {
-                val authContext = SecurityContextHolder.getContext().authentication;
-                val user: User? = findUserByUsername(authContext.name);
-                UserService.user = user;
-                user;
-            } else {
-                throw AuthenticationException("User Not Authenticated");
-            }
+        return if (SecurityContextHolder.getContext().authentication.isAuthenticated) {
+            val authContext = SecurityContextHolder.getContext().authentication;
+            val user: User? = findUserByUsername(authContext.name);
+            user;
         } else {
-            UserService.user as User;
+            throw AuthenticationException("User Not Authenticated");
         }
-    }
 
-    companion object {
-        var user: User? = null;
     }
 
     @Throws(UsernameNotFoundException::class)
