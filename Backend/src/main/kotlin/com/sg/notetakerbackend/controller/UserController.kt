@@ -58,7 +58,7 @@ class UserController @Autowired constructor(
                 ResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-        return ResponseEntity("User with " + user.username + " created!", HttpStatus.OK);
+        return ResponseEntity(user, HttpStatus.OK);
     }
 
     @RequestMapping(value = ["/sign-in"], method = [RequestMethod.POST])
@@ -67,8 +67,9 @@ class UserController @Autowired constructor(
         authenticate(authenticationRequest.username, authenticationRequest.password)
         val userDetails: UserDetails = userService
             .loadUserByUsername(authenticationRequest.username)
+        val resUser=userService.findUserByUsername(authenticationRequest.username);
         val token = jwtTokenUtil.generateToken(userDetails)
-        return ResponseEntity.ok<Any>(token!!);
+        return ResponseEntity.ok<Any>(JWTResponse(token!!,resUser!!));
     }
 
 

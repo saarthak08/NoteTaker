@@ -15,9 +15,9 @@ data class Note(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0
 
-    @get:net.minidev.json.annotate.JsonIgnore
-    @set:JsonProperty
     @ManyToOne(targetEntity = User::class)
     @JoinColumn(name = "user_id")
-    var user: User?=null;
+    var user: User?=null
+    @JsonIgnore get
+    @JsonProperty set
 }
