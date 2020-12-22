@@ -24,6 +24,8 @@ import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletResponse
 
 import javax.servlet.http.HttpServletRequest
+import kotlin.jvm.Throws
+import kotlin.math.log
 
 
 @Component
@@ -33,11 +35,13 @@ class JWTRequestFilter @Autowired constructor(
 ) : OncePerRequestFilter() {
 
 
+    @Throws(Exception::class)
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
+
         val requestTokenHeader = request.getHeader("Authorization")
         var username: String? = null
         var jwtToken: String? = null

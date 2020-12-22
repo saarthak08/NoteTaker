@@ -6,10 +6,12 @@ import com.sg.notetakerbackend.repository.NoteRepository
 import com.sg.notetakerbackend.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import kotlin.jvm.Throws
 
 @Service
 class NoteService @Autowired constructor(private val noteRepository: NoteRepository,private val userRepository: UserRepository) {
 
+    @Throws(Exception::class)
     fun addNote(note:Note,user:User) {
         note.user = user;
         user.notes.add(note);
@@ -17,6 +19,7 @@ class NoteService @Autowired constructor(private val noteRepository: NoteReposit
         userRepository.save(user);
     }
 
+    @Throws(Exception::class)
     fun deleteNote(noteId:Long,user:User) {
         user.notes.removeIf {
             it.id==noteId;
@@ -34,5 +37,9 @@ class NoteService @Autowired constructor(private val noteRepository: NoteReposit
         };
         noteRepository.save(note);
         userRepository.save(user);
+    }
+
+    fun getAllNotes(user:User):MutableList<Note> {
+        return user.notes;
     }
 }

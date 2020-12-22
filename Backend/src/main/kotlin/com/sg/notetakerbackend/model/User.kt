@@ -8,18 +8,21 @@ import java.io.Serializable
 import javax.persistence.*
 
 @Entity
-data class User(var name:String, var username:String):Serializable {
-
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id:Long=0;
+data class User(
+    var username: String,
 
     @get:JsonIgnore
     @set:JsonProperty
-    @Transient
-    var password:String="";
+    var password: String
+) : Serializable {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long = 0
 
-    @OneToMany(mappedBy = "id",fetch = FetchType.EAGER)
+    var name: String="";
+
+    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
     var notes: MutableList<Note> = mutableListOf<Note>();
 }

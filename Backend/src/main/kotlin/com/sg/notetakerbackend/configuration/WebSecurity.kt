@@ -55,8 +55,10 @@ class WebSecurity @Autowired constructor(
         httpSecurity.cors()
             .and()
             .csrf().disable() // dont authenticate this particular request
-            .authorizeRequests().antMatchers("/api/user/**")
-            .permitAll().anyRequest() // all other requests need to be authenticated
+            .authorizeRequests().antMatchers("/api/user/sign-up/**").permitAll()
+            .and()
+            .authorizeRequests().antMatchers("/api/user/sign-in").permitAll()
+            .anyRequest() // all other requests need to be authenticated
             .authenticated().and().exceptionHandling() // make sure we use stateless session; session won't be used to
             .authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

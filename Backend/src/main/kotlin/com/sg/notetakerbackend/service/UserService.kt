@@ -14,29 +14,26 @@ import javax.security.sasl.AuthenticationException
 import kotlin.jvm.Throws
 
 @Service
-class UserService @Autowired constructor(private val userRepository: UserRepository):UserDetailsService {
+class UserService @Autowired constructor(private val userRepository: UserRepository) : UserDetailsService {
 
+    @kotlin.jvm.Throws(AuthenticationException::class)
+    fun getCurrentUser(): User? {
+        return if (UserService.user == null) {
+            if (SecurityContextHolder.getContext().authentication.isAuthenticated) {
+                val authContext = SecurityContextHolder.getContext().authentication;
+                val user: User? = findUserByUsername(authContext.name);
+                UserService.user = user;
+                user;
+            } else {
+                throw AuthenticationException("User Not Authenticated");
+            }
+        } else {
+            UserService.user as User;
+        }
+    }
 
     companion object {
-        private var user:User?=null;
-
-        @Autowired
-        private var userRepository:UserRepository?=null;
-
-        @Throws(AuthenticationException::class)
-        fun getCurrentUser(): User {
-            return if(user==null) {
-                if (SecurityContextHolder.getContext().authentication.isAuthenticated) {
-                    val authContext = SecurityContextHolder.getContext().authentication;
-                    val user:User= userRepository!!.findByUsername(authContext.name);
-                    user;
-                } else {
-                    throw AuthenticationException("User Not Authenticated");
-                }
-            } else {
-                user as User;
-            }
-        }
+        var user: User? = null;
     }
 
     @Throws(UsernameNotFoundException::class)
@@ -46,8 +43,17 @@ class UserService @Autowired constructor(private val userRepository: UserReposit
         return org.springframework.security.core.userdetails.User(user.username, user.password, emptyList());
     }
 
-    fun addUser(user:User) {
+    @Throws(Exception::class)
+    fun addUser(user: User) {
+        var userExists: User? = userRepository.findByUsername(user.username);
+        if (userExists != null) {
+            throw Exception("User Already Present");
+        }
         userRepository.save(user);
+    }
+
+    fun findUserByUsername(username: String): User? {
+        return userRepository.findByUsername(username);
     }
 
 }
